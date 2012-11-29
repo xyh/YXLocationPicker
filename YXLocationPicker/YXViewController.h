@@ -10,4 +10,5 @@
 
 @interface YXViewController : UIViewController
 
+- (IBAction)pickLocationButtonClicked:(id)sender;
 @end

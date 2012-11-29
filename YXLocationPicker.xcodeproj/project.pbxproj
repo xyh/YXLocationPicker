@@ -18,6 +18,7 @@
 		C1852FB81666F5ED00A3CD9A /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C1852FB71666F5ED00A3CD9A /* Default-568h@2x.png */; };
 		C1852FBB1666F5ED00A3CD9A /* YXViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C1852FBA1666F5ED00A3CD9A /* YXViewController.m */; };
 		C1852FBE1666F5ED00A3CD9A /* YXViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C1852FBC1666F5ED00A3CD9A /* YXViewController.xib */; };
+		C1852FC61666FC4900A3CD9A /* YXLocationPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C1852FC51666FC4900A3CD9A /* YXLocationPickerViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +38,8 @@
 		C1852FB91666F5ED00A3CD9A /* YXViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YXViewController.h; sourceTree = "<group>"; };
 		C1852FBA1666F5ED00A3CD9A /* YXViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YXViewController.m; sourceTree = "<group>"; };
 		C1852FBD1666F5ED00A3CD9A /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/YXViewController.xib; sourceTree = "<group>"; };
+		C1852FC41666FC4900A3CD9A /* YXLocationPickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YXLocationPickerViewController.h; sourceTree = "<group>"; };
+		C1852FC51666FC4900A3CD9A /* YXLocationPickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YXLocationPickerViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +92,8 @@
 				C1852FBA1666F5ED00A3CD9A /* YXViewController.m */,
 				C1852FBC1666F5ED00A3CD9A /* YXViewController.xib */,
 				C1852FA81666F5ED00A3CD9A /* Supporting Files */,
+				C1852FC41666FC4900A3CD9A /* YXLocationPickerViewController.h */,
+				C1852FC51666FC4900A3CD9A /* YXLocationPickerViewController.m */,
 			);
 			path = YXLocationPicker;
 			sourceTree = "<group>";
@@ -177,6 +182,7 @@
 				C1852FAE1666F5ED00A3CD9A /* main.m in Sources */,
 				C1852FB21666F5ED00A3CD9A /* YXAppDelegate.m in Sources */,
 				C1852FBB1666F5ED00A3CD9A /* YXViewController.m in Sources */,
+				C1852FC61666FC4900A3CD9A /* YXLocationPickerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,6 +264,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "YXLocationPicker/YXLocationPicker-Prefix.pch";
 				INFOPLIST_FILE = "YXLocationPicker/YXLocationPicker-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -269,6 +276,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "YXLocationPicker/YXLocationPicker-Prefix.pch";
 				INFOPLIST_FILE = "YXLocationPicker/YXLocationPicker-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

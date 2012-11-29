@@ -7,6 +7,7 @@
 //
 
 #import "YXViewController.h"
+#import "YXLocationPickerViewController.h"
 
 @interface YXViewController ()
 
@@ -26,4 +27,23 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (IBAction)pickLocationButtonClicked:(id)sender {
+    YXLocationPickerViewController *locationPicker = [[YXLocationPickerViewController alloc] init];
+    
+    [locationPicker setCancelBlock:^{
+        NSLog(@"Picking location cancelled!");
+    }];
+    
+    [locationPicker setCompletionBlock:^(BOOL succeeded, NSDictionary *info) {
+        if (succeeded) {
+            NSLog(@"Picking location succeeded!");
+        }
+        else
+        {
+            NSLog(@"Picking location failed!");
+        }
+    }];
+    
+    [self presentViewController:locationPicker animated:YES completion:nil];
+}
 @end
