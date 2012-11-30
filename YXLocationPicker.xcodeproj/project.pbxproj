@@ -18,11 +18,11 @@
 		C1852FB81666F5ED00A3CD9A /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C1852FB71666F5ED00A3CD9A /* Default-568h@2x.png */; };
 		C1852FBB1666F5ED00A3CD9A /* YXViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C1852FBA1666F5ED00A3CD9A /* YXViewController.m */; };
 		C1852FBE1666F5ED00A3CD9A /* YXViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C1852FBC1666F5ED00A3CD9A /* YXViewController.xib */; };
-		C1852FC61666FC4900A3CD9A /* YXLocationPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C1852FC51666FC4900A3CD9A /* YXLocationPickerViewController.m */; };
-		C193192716670ECB002AD5C4 /* current-location-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = C193192616670ECB002AD5C4 /* current-location-icon.png */; };
-		C1931929166717C8002AD5C4 /* magnifying-glass.png in Resources */ = {isa = PBXBuildFile; fileRef = C1931928166717C8002AD5C4 /* magnifying-glass.png */; };
 		C193192F16671BDE002AD5C4 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C193192E16671BDE002AD5C4 /* CoreLocation.framework */; };
 		C193193116671C27002AD5C4 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C193193016671C27002AD5C4 /* MapKit.framework */; };
+		C193193F16684FF7002AD5C4 /* current-location-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = C193193B16684FF7002AD5C4 /* current-location-icon.png */; };
+		C193194016684FF7002AD5C4 /* magnifying-glass.png in Resources */ = {isa = PBXBuildFile; fileRef = C193193C16684FF7002AD5C4 /* magnifying-glass.png */; };
+		C193194116684FF7002AD5C4 /* YXLocationPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C193193E16684FF7002AD5C4 /* YXLocationPickerViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,12 +42,12 @@
 		C1852FB91666F5ED00A3CD9A /* YXViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YXViewController.h; sourceTree = "<group>"; };
 		C1852FBA1666F5ED00A3CD9A /* YXViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YXViewController.m; sourceTree = "<group>"; };
 		C1852FBD1666F5ED00A3CD9A /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/YXViewController.xib; sourceTree = "<group>"; };
-		C1852FC41666FC4900A3CD9A /* YXLocationPickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YXLocationPickerViewController.h; sourceTree = "<group>"; };
-		C1852FC51666FC4900A3CD9A /* YXLocationPickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YXLocationPickerViewController.m; sourceTree = "<group>"; };
-		C193192616670ECB002AD5C4 /* current-location-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "current-location-icon.png"; sourceTree = "<group>"; };
-		C1931928166717C8002AD5C4 /* magnifying-glass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "magnifying-glass.png"; sourceTree = "<group>"; };
 		C193192E16671BDE002AD5C4 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		C193193016671C27002AD5C4 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		C193193B16684FF7002AD5C4 /* current-location-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "current-location-icon.png"; sourceTree = "<group>"; };
+		C193193C16684FF7002AD5C4 /* magnifying-glass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "magnifying-glass.png"; sourceTree = "<group>"; };
+		C193193D16684FF7002AD5C4 /* YXLocationPickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YXLocationPickerViewController.h; sourceTree = "<group>"; };
+		C193193E16684FF7002AD5C4 /* YXLocationPickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YXLocationPickerViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,16 +98,13 @@
 		C1852FA71666F5ED00A3CD9A /* YXLocationPicker */ = {
 			isa = PBXGroup;
 			children = (
-				C1931928166717C8002AD5C4 /* magnifying-glass.png */,
-				C193192616670ECB002AD5C4 /* current-location-icon.png */,
+				C193193A16684FF7002AD5C4 /* YXLocationPicker */,
 				C1852FB01666F5ED00A3CD9A /* YXAppDelegate.h */,
 				C1852FB11666F5ED00A3CD9A /* YXAppDelegate.m */,
 				C1852FB91666F5ED00A3CD9A /* YXViewController.h */,
 				C1852FBA1666F5ED00A3CD9A /* YXViewController.m */,
 				C1852FBC1666F5ED00A3CD9A /* YXViewController.xib */,
 				C1852FA81666F5ED00A3CD9A /* Supporting Files */,
-				C1852FC41666FC4900A3CD9A /* YXLocationPickerViewController.h */,
-				C1852FC51666FC4900A3CD9A /* YXLocationPickerViewController.m */,
 			);
 			path = YXLocationPicker;
 			sourceTree = "<group>";
@@ -124,6 +121,17 @@
 				C1852FB71666F5ED00A3CD9A /* Default-568h@2x.png */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		C193193A16684FF7002AD5C4 /* YXLocationPicker */ = {
+			isa = PBXGroup;
+			children = (
+				C193193B16684FF7002AD5C4 /* current-location-icon.png */,
+				C193193C16684FF7002AD5C4 /* magnifying-glass.png */,
+				C193193D16684FF7002AD5C4 /* YXLocationPickerViewController.h */,
+				C193193E16684FF7002AD5C4 /* YXLocationPickerViewController.m */,
+			);
+			path = YXLocationPicker;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -183,8 +191,8 @@
 				C1852FB61666F5ED00A3CD9A /* Default@2x.png in Resources */,
 				C1852FB81666F5ED00A3CD9A /* Default-568h@2x.png in Resources */,
 				C1852FBE1666F5ED00A3CD9A /* YXViewController.xib in Resources */,
-				C193192716670ECB002AD5C4 /* current-location-icon.png in Resources */,
-				C1931929166717C8002AD5C4 /* magnifying-glass.png in Resources */,
+				C193193F16684FF7002AD5C4 /* current-location-icon.png in Resources */,
+				C193194016684FF7002AD5C4 /* magnifying-glass.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -198,7 +206,7 @@
 				C1852FAE1666F5ED00A3CD9A /* main.m in Sources */,
 				C1852FB21666F5ED00A3CD9A /* YXAppDelegate.m in Sources */,
 				C1852FBB1666F5ED00A3CD9A /* YXViewController.m in Sources */,
-				C1852FC61666FC4900A3CD9A /* YXLocationPickerViewController.m in Sources */,
+				C193194116684FF7002AD5C4 /* YXLocationPickerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
