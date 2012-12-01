@@ -28,6 +28,9 @@
         self.title = @"Location";
         self.currentLocationButtonImageName = @"current-location-icon.png";
         _isFirstTimeUpdateUserLocation = YES;
+        self.resultChoosen = NO;
+        self.suggestArray = [NSArray array];
+        self.geoCoder = [[CLGeocoder alloc] init];
         
     }
     return self;
@@ -51,10 +54,6 @@
                                                                          action:@selector(doneItemClicked:)];
     [[self navigationItem] setRightBarButtonItem:doneItem];
     
-//    UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-//                                                                                target:self
-//                                                                                action:@selector(cancelButtonClicked:)];
-//    [[self navigationItem] setLeftBarButtonItem:cancelItem];
     [[self navigationItem] setTitle:self.title];
     
     // current location button
@@ -79,6 +78,9 @@
     imageView.image = [UIImage imageNamed:@"magnifying-glass.png"];
     self.addressTextField.leftView = imageView;
     self.addressTextField.placeholder = @"Enter an Address";
+    self.addressTextField.autocapitalizationType = UITextAutocapitalizationTypeWords;
+    self.addressTextField.clearButtonMode = UITextFieldViewModeWhileEditing;
+    self.addressTextField.autocorrectionType = UITextAutocorrectionTypeNo;
     self.addressTextFieldBackgroundView = [[UIView alloc] initWithFrame:ADDRESS_TEXT_FIELD_BACKGROUND_FRAME];
     [self.addressTextFieldBackgroundView addSubview:self.addressTextField];
     self.addressTextFieldBackgroundView.backgroundColor = [UIColor whiteColor];
@@ -95,18 +97,60 @@
     [self.mapView setShowsUserLocation:YES];
     [self.rootViewController.view insertSubview:self.mapView atIndex:0];
     
-    if (!self.locationManager) {
-        self.locationManager = [[CLLocationManager alloc] init];
-    }
-    [self.locationManager setDelegate:self];
-    [self.locationManager setDesiredAccuracy:kCLLocationAccuracyBest];
-//    [self.locationManager startUpdatingLocation];
+    // address names table
+    self.addressTableBackgroundView = [[UIView alloc] initWithFrame:ADDRESS_TABLE_BACKGROUND_FRAME];
+    self.addressTableBackgroundView.backgroundColor = [UIColor whiteColor];
+    self.addressTableBackgroundView.layer.shadowColor = [UIColor colorWithWhite:0.12 alpha:1].CGColor;
+    self.addressTableBackgroundView.layer.shadowOffset = CGSizeMake(0, 0.5);
+    self.addressTableBackgroundView.layer.shadowRadius = 1;
+    self.addressTableBackgroundView.layer.shadowOpacity = 1;
+    [self.rootViewController.view addSubview:self.addressTableBackgroundView];
+    
+    self.addressTable = [[UITableView alloc] initWithFrame:ADDRESS_TABLE_FRAME style:UITableViewStylePlain];
+    self.addressTable.delegate = self;
+    self.addressTable.dataSource = self;
+    [self.addressTableBackgroundView addSubview:self.addressTable];
+    
+    // result view
+    self.resultView = [[UIView alloc] initWithFrame:RESULT_VIEW_FRAME];
+    self.resultView.backgroundColor = [UIColor colorWithRed:1.0f green:0.984f blue:0.941 alpha:1];
+    self.resultView.layer.shadowColor = [UIColor colorWithWhite:0.12 alpha:1].CGColor;
+    self.resultView.layer.shadowOffset = CGSizeMake(0, 0.5);
+    self.resultView.layer.shadowRadius = 1;
+    self.resultView.layer.shadowOpacity = 1;
+    [self.rootViewController.view addSubview:self.resultView];
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    // register for keyboard notifications
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWasShown:)
+                                                 name:UIKeyboardWillShowNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillHide:)
+                                                 name:UIKeyboardWillHideNotification
+                                               object:nil];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    // unregister for keyboard notifications while not visible.
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIKeyboardWillShowNotification
+                                                  object:nil];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIKeyboardWillHideNotification
+                                                  object:nil];
 }
 
 - (void)setCompletionBlock:(YXLocationPickerCompletionBlock)completionBlock
@@ -148,11 +192,7 @@
     }
 }
 
-#pragma mark - CLLocationManagerDelegate
-- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
-{
 
-}
 
 #pragma mark - MKMapViewDelegate
 - (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation
@@ -164,6 +204,11 @@
     }
 }
 
+- (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
+{
+    [self.addressTable reloadRowsAtIndexPaths:[NSArray arrayWithObject:[NSIndexPath indexPathForRow:[self.suggestArray count] inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+}
+
 #pragma mark - UITextFieldDelegate
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
@@ -171,7 +216,183 @@
     return YES;
 }
 
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    NSString *oldText = [textField text];
+    NSString *newText = [oldText stringByReplacingCharactersInRange:range withString:string];
+    
+    // if text is empty, clear suggest list
+    if ([newText isEqualToString:@""]) {
+        self.suggestArray = [NSArray array];
+        [[self addressTable] reloadData];
+        return YES;
+    }
+    
+    // update suggest list
+    [self predictUncompletedAddress:newText];
+    
+    return YES;
+}
+
+#pragma mark - UITableViewDataSource
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 1 + [self.suggestArray count];
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"YXAddressTableCell"];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"YXAddressTableCell"];
+    }
+    
+    cell.detailTextLabel.text = nil;
+    cell.textLabel.font = [UIFont fontWithName:@"Helvatica" size:10];
+    if (indexPath.row == [self.suggestArray count]) {
+        cell.textLabel.text = @"Use Pin on the Map";
+        CLLocationCoordinate2D currentFocusedCoordinate = self.mapView.centerCoordinate;
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"%f, %f", currentFocusedCoordinate.latitude, currentFocusedCoordinate.longitude];
+    }
+    else {
+        id place = [self.suggestArray objectAtIndex:indexPath.row];
+        NSString *addressString = [place objectForKey:@"description"];
+        cell.textLabel.text = addressString;
+        NSRange range = [addressString rangeOfString:@", " options:NSBackwardsSearch];
+        int index = range.location;
+        
+        if (index != NSNotFound) {
+            NSString *countryString = [addressString substringFromIndex:index+1];
+            countryString = [countryString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            cell.detailTextLabel.text = countryString;
+        }
+        
+    }
+    
+    
+    cell.selectionStyle = UITableViewCellSelectionStyleGray;
+    return cell;
+}
+
+#pragma mark - UITableViewDelegate
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+//    NSLog(@"%@", [tableView cellForRowAtIndexPath:indexPath].textLabel.text);
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    [self.addressTextField resignFirstResponder];
+    
+    if (indexPath.row < [self.suggestArray count]) {
+        id place = [self.suggestArray objectAtIndex:indexPath.row];
+        NSString * addressString = [place objectForKey:@"description"];
+        
+        [self searchAddressString:addressString]; 
+    }
+    else {
+        CLLocationCoordinate2D currentFocusedCoordinate = self.mapView.centerCoordinate;
+        [self focusOnLocation:currentFocusedCoordinate];
+    }
+    
+}
+
+#pragma mark - Keyboard notification
+-(void) keyboardWasShown:(NSNotification*)aNotification
+{ 
+    NSDictionary* info = [aNotification userInfo];
+    
+    NSTimeInterval animationDuration;
+    UIViewAnimationCurve animationCurve;
+    CGRect keyboardFrame;
+    [[info objectForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&animationCurve];
+    [[info objectForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&animationDuration];
+    [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] getValue:&keyboardFrame];
+    
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:animationDuration];
+    [UIView setAnimationCurve:animationCurve];
+    
+    self.addressTableBackgroundView.frame = ADDRESS_TABLE_BACKGROUND_FRAME_UP;
+    
+    [UIView commitAnimations];
+}
+
+-(void) keyboardWillHide:(NSNotification*)aNotification
+{     
+    NSDictionary* info = [aNotification userInfo];
+    
+    NSTimeInterval animationDuration;
+    UIViewAnimationCurve animationCurve;
+    CGRect keyboardFrame;
+    [[info objectForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&animationCurve];
+    [[info objectForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&animationDuration];
+    [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] getValue:&keyboardFrame];
+    
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:animationDuration];
+    [UIView setAnimationCurve:animationCurve];
+    
+    self.addressTableBackgroundView.frame = ADDRESS_TABLE_BACKGROUND_FRAME;
+    
+    [UIView commitAnimations];
+}
+
+
 #pragma mark - helpers
 
+- (void)predictUncompletedAddress:(NSString *)addressString
+{
+	// Forward geocode!
+    CLLocationCoordinate2D location = [self.mapView userLocation].location.coordinate;
+    NSString *formattedAddressString = [self validizeAddressStringForGoogleAPI:addressString];
+    
+    NSString *urlString = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/place/autocomplete/json?input=%@&types=geocode&location=%f,%f&radius=200000&sensor=false&key=%@", formattedAddressString, location.latitude, location.longitude, GOOGLE_V3_API_KEY];
+    //NSLog(@"%@", urlString);
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    self.operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        if ([[JSON objectForKey:@"status"] isEqual:@"OK"]) {
+            self.suggestArray = [JSON objectForKey:@"predictions"];
+            [self.addressTable reloadData];
+        }
+    } failure:nil];
+    [self.operation start];
+    
+}
+
+- (void)searchAddressString:(NSString *)addressString
+{
+//    NSString *formattedAddressString = [self validizeAddressStringForGoogleAPI:addressString];
+    if (!self.geoCoder) {
+        self.geoCoder = [[CLGeocoder alloc] init];
+    }
+    
+    [self.geoCoder geocodeAddressString:addressString completionHandler:^(NSArray *placemarks, NSError *error) {
+        if (!error && [placemarks count] > 0) {
+            CLPlacemark *place = [placemarks objectAtIndex:0];
+//            NSString *placeString = ABCreateStringWithAddressDictionary(place.addressDictionary, YES);
+            self.resultLat = place.location.coordinate.latitude;
+            self.resultLng = place.location.coordinate.longitude;
+            
+            [self focusOnLocation:place.location.coordinate];
+            
+        }
+    }];
+    
+}
+
+- (void)focusOnLocation:(CLLocationCoordinate2D)coordinate
+{
+    CLLocationCoordinate2D center = coordinate;
+    [self.mapView setRegion:MKCoordinateRegionMakeWithDistance(center, MAP_VIEW_SPAN_WIDTH, MAP_VIEW_SPAN_WIDTH) animated:YES];
+}
+
+- (NSString *)validizeAddressStringForGoogleAPI:(NSString *)originalString
+{
+    NSString *formattedAddressString = [originalString stringByReplacingOccurrencesOfString:@" " withString:@"+"];
+    formattedAddressString = [formattedAddressString stringByReplacingOccurrencesOfString:@"/" withString:@""];
+    formattedAddressString = [formattedAddressString stringByReplacingOccurrencesOfString:@"\\" withString:@""];
+    formattedAddressString = [formattedAddressString stringByReplacingOccurrencesOfString:@"&" withString:@""];
+    formattedAddressString = [formattedAddressString stringByReplacingOccurrencesOfString:@"?" withString:@""];
+    return formattedAddressString;
+}
 
 @end
